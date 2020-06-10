@@ -15,7 +15,7 @@ blblm_pl(formula, data, m, B, Cluster)
 
 \item{B}{numeric}
 
-\item{Cluster}{SOCKcluster}
+\item{Cluster}{numeric}
 }
 \value{
 linear regression

@@ -1,7 +1,7 @@
 #' @import purrr
 #' @import tidyverse
 #' @import stats
-#' @import parallel
+#' @import furrr
 #' @import rbenchmark
 #' @importFrom  magrittr %>%
 #' @importFrom  utils capture.output
@@ -42,7 +42,7 @@ blblm <- function(formula, data, m = 10, B = 5000) {
 #' @param data dataframe
 #' @param m numeric
 #' @param B numeric
-#' @param Cluster SOCKcluster
+#' @param Cluster numeric
 #'
 #' @return linear regression
 #' @export
@@ -51,11 +51,10 @@ blblm <- function(formula, data, m = 10, B = 5000) {
 #' blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
 blblm_pl <- function(formula, data, m, B, Cluster) {
   data_list <- split_data(data, m)
-  estimates <- parLapply(Cluster,
+  suppressWarnings(plan(multiprocess, workers = Cluster))
+  estimates <- future_map(
     data_list,
-    function(formula = formula, data = data, n = nrow(data), B = B) {
-    lm_each_subsample(formula = formula, data = data, n = n, B = B)
-    })
+    ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
   res <- list(estimates = estimates, formula = formula)
   class(res) <- "blblm"
   invisible(res)
@@ -125,7 +124,7 @@ lm_each_boot <- function(formula, data, n) {
 #'
 #' @examples
 #' lm1(mpg ~ wt * hp , mtcars, NULL)
-lm1 <- function(formula, data, freqs) {
+lm1 <- function(formula, data, freqs = NULL) {
   # drop the original closure of formula,
   # otherwise the formula will pick a wront variable from the global scope.
   environment(formula) <- environment()

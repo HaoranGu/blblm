@@ -1,0 +1,22 @@
+---
+title: "blblm presentation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(blblm)
+fit<- blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
+coef(fit)
+fit1 <- blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
+coef(fit1)
+bench::mark(
+  blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100),
+  blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4),
+  relative = TRUE
+)
+```
+

@@ -4,7 +4,7 @@
 \alias{lm1}
 \title{estimate the regression estimates based on given the number of repetitions}
 \usage{
-lm1(formula, data, freqs)
+lm1(formula, data, freqs = NULL)
 }
 \arguments{
 \item{formula}{a formula}

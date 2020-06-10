@@ -14,7 +14,7 @@ Imports:
     purrr,
     tidyverse,
     stats,
-    parallel,
+    furrr,
     rbenchmark,
     magrittr
 Roxygen: list(markdown = TRUE)
