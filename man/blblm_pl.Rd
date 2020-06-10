@@ -24,5 +24,5 @@ linear regression
 Linear Regression with one or more cpus
 }
 \examples{
-blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
+
 }

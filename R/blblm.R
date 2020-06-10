@@ -3,6 +3,7 @@
 #' @import stats
 #' @import furrr
 #' @import rbenchmark
+#' @import future
 #' @importFrom  magrittr %>%
 #' @importFrom  utils capture.output
 #' @aliases NULL
@@ -48,7 +49,7 @@ blblm <- function(formula, data, m = 10, B = 5000) {
 #' @export
 #'
 #' @examples
-#' blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
+#'
 blblm_pl <- function(formula, data, m, B, Cluster) {
   data_list <- split_data(data, m)
   suppressWarnings(plan(multiprocess, workers = Cluster))
@@ -144,6 +145,10 @@ blbcoef <- function(fit) {
 
 
 #' compute sigma from fit
+#' @param fit a fit model
+#'
+#' @return numeric
+#' @export
 blbsigma <- function(fit) {
   p <- fit$rank
   y <- model.extract(fit$model, "response")

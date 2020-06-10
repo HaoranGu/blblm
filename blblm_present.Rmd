@@ -8,15 +8,37 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+#This rmd file is to show the improved work of package of blblm
+#First load libraries needed.
 library(blblm)
+library(devtools)
+```
+
+
+```{r}
+#test for the original blblm function
 fit<- blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
 coef(fit)
+#test for the parallel blblm function
 fit1 <- blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
 coef(fit1)
+#Bench mark
 bench::mark(
   blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100),
   blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4),
-  relative = TRUE
+  check = FALSE
+)
+#it is not always true that the more cpus, the faster the result.
+```
+
+```{r}
+#we can try different cores.
+bench::mark(
+  blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 3),
+  blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4),
+  blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 5),
+  blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 6),
+  check = FALSE
 )
 ```
 
