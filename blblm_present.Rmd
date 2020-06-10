@@ -41,4 +41,15 @@ bench::mark(
   check = FALSE
 )
 ```
+```{r}
+#Run the lm1 and lm
+lm1(mpg ~ wt * hp , mtcars, NULL)
+lm(mpg ~ wt * hp , mtcars)
+
+bench::mark(
+  lm1(mpg ~ wt * hp , mtcars, NULL),
+  lm(mpg ~ wt * hp , mtcars),
+  check = FALSE
+)
+```
 
