@@ -1,18 +1,21 @@
 Package: blblm
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Linear Regression with Little Bag of Bootstraps
 Version: 0.1.0
-Author: Who wrote it
+Author: Haoran Gu
 Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Description: Use little bag of bootstraps to do linear regression, including functions required while running blblm().
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat (>= 2.1.0)
 Imports: 
     purrr,
+    tidyverse,
+    stats,
+    parallel,
+    rbenchmark,
     magrittr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0

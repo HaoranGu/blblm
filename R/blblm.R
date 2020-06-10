@@ -1,6 +1,10 @@
 #' @import purrr
+#' @import tidyverse
 #' @import stats
-#' @importFrom magrittr %>%
+#' @import parallel
+#' @import rbenchmark
+#' @importFrom  magrittr %>%
+#' @aliases NULL
 #' @details
 #' Linear Regression with Little Bag of Bootstraps
 "_PACKAGE"
@@ -10,17 +14,30 @@
 # from https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 utils::globalVariables(c("."))
 
-
+#'Linear Regression with Little Bag of Bootstraps
+#' @param formula a formula
+#' @param data dataframe
+#' @param m numeric
+#' @param B numeric
+#' @param Cluster SOCKcluster
+#'
+#' @return linear regression
 #' @export
-blblm <- function(formula, data, m = 10, B = 5000) {
+#'
+#' @examples
+#' blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
+blblm <- function(formula, data, m, B, Cluster) {
   data_list <- split_data(data, m)
-  estimates <- map(
+  estimates <- parLapply(Cluster,
     data_list,
-    ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
+    function(formula = formula, data = data, n = nrow(data), B = B) {
+    lm_each_subsample(formula = formula, data = data, n = n, B = B)
+    })
   res <- list(estimates = estimates, formula = formula)
   class(res) <- "blblm"
   invisible(res)
 }
+
 
 
 #' split data into m parts of approximated equal sizes
@@ -67,6 +84,12 @@ blbsigma <- function(fit) {
   w <- fit$weights
   sqrt(sum(w * (e^2)) / (sum(w) - p))
 }
+
+#'Hello,world!
+hello <- function(){
+  print("Hello, world!")
+}
+
 
 
 #' @export
@@ -134,6 +157,8 @@ predict.blblm <- function(object, new_data, confidence = FALSE, level = 0.95, ..
 }
 
 
+
+
 mean_lwr_upr <- function(x, level = 0.95) {
   alpha <- 1 - level
   c(fit = mean(x), quantile(x, c(alpha / 2, 1 - alpha / 2)) %>% set_names(c("lwr", "upr")))
@@ -150,3 +175,4 @@ map_cbind <- function(.x, .f, ...) {
 map_rbind <- function(.x, .f, ...) {
   map(.x, .f, ...) %>% reduce(rbind)
 }
+
