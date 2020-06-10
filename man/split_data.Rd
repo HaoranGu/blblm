@@ -6,6 +6,17 @@
 \usage{
 split_data(data, m)
 }
+\arguments{
+\item{data}{dataframe}
+
+\item{m}{numeric}
+}
+\value{
+several datasets
+}
 \description{
 split data into m parts of approximated equal sizes
+}
+\examples{
+split_data(mtcars, 3)
 }

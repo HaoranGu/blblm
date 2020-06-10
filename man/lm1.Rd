@@ -6,6 +6,19 @@
 \usage{
 lm1(formula, data, freqs)
 }
+\arguments{
+\item{formula}{a formula}
+
+\item{data}{dateframe}
+
+\item{freqs}{an optional vector}
+}
+\value{
+linear regression model
+}
 \description{
 estimate the regression estimates based on given the number of repetitions
+}
+\examples{
+lm1(mpg ~ wt * hp , mtcars, NULL)
 }

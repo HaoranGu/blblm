@@ -4,6 +4,7 @@
 #' @import parallel
 #' @import rbenchmark
 #' @importFrom  magrittr %>%
+#' @importFrom  utils capture.output
 #' @aliases NULL
 #' @details
 #' Linear Regression with Little Bag of Bootstraps
@@ -14,7 +15,29 @@
 # from https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R
 utils::globalVariables(c("."))
 
-#'Linear Regression with Little Bag of Bootstraps
+#'Linear Regression with one cpu
+#' @param formula a formula
+#' @param data dataframe
+#' @param m numeric
+#' @param B numeric
+#'
+#' @return linear regression
+#' @export
+#'
+#' @examples
+#' blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
+blblm <- function(formula, data, m = 10, B = 5000) {
+  data_list <- split_data(data, m)
+  estimates <- map(
+    data_list,
+    ~ lm_each_subsample(formula = formula, data = ., n = nrow(data), B = B))
+  res <- list(estimates = estimates, formula = formula)
+  class(res) <- "blblm"
+  invisible(res)
+}
+
+
+#'Linear Regression with one or more cpus
 #' @param formula a formula
 #' @param data dataframe
 #' @param m numeric
@@ -25,8 +48,8 @@ utils::globalVariables(c("."))
 #' @export
 #'
 #' @examples
-#' blblm(mpg ~ wt * hp, data = mtcars, m = 3, B = 100)
-blblm <- function(formula, data, m, B, Cluster) {
+#' blblm_pl(mpg ~ wt * hp, data = mtcars, m = 3, B = 100, 4)
+blblm_pl <- function(formula, data, m, B, Cluster) {
   data_list <- split_data(data, m)
   estimates <- parLapply(Cluster,
     data_list,
@@ -41,6 +64,15 @@ blblm <- function(formula, data, m, B, Cluster) {
 
 
 #' split data into m parts of approximated equal sizes
+#'
+#' @param data dataframe
+#' @param m numeric
+#'
+#' @return several datasets
+#' @export
+#'
+#' @examples
+#' split_data(mtcars, 3)
 split_data <- function(data, m) {
   idx <- sample.int(m, nrow(data), replace = TRUE)
   data %>% split(idx)
@@ -48,12 +80,34 @@ split_data <- function(data, m) {
 
 
 #' compute the estimates
+#'
+#' @param formula a formula
+#' @param data dataframe
+#' @param n numeric
+#' @param B numeric
+#'
+#' @return dataframes
+#' @export
+#'
+#' @examples
+#' lm_each_subsample(mpg ~ wt * hp , mtcars, 3, 100)
+#'
 lm_each_subsample <- function(formula, data, n, B) {
   replicate(B, lm_each_boot(formula, data, n), simplify = FALSE)
 }
 
 
 #' compute the regression estimates for a blb dataset
+#'
+#' @param formula a formula
+#' @param data dateframe
+#' @param n integer
+#'
+#' @return dataframes
+#' @export
+#'
+#' @examples
+#' lm_each_boot(mpg ~ wt * hp , mtcars, 3, 100, 3)
 lm_each_boot <- function(formula, data, n) {
   freqs <- rmultinom(1, n, rep(1, nrow(data)))
   lm1(formula, data, freqs)
@@ -61,6 +115,16 @@ lm_each_boot <- function(formula, data, n) {
 
 
 #' estimate the regression estimates based on given the number of repetitions
+#'
+#' @param formula a formula
+#' @param data dateframe
+#' @param freqs an optional vector
+#'
+#' @return linear regression model
+#' @export
+#'
+#' @examples
+#' lm1(mpg ~ wt * hp , mtcars, NULL)
 lm1 <- function(formula, data, freqs) {
   # drop the original closure of formula,
   # otherwise the formula will pick a wront variable from the global scope.
@@ -71,6 +135,10 @@ lm1 <- function(formula, data, freqs) {
 
 
 #' compute the coefficients from fit
+#' @param fit a fit model
+#'
+#' @return coeffcients
+#' @export
 blbcoef <- function(fit) {
   coef(fit)
 }
@@ -85,7 +153,8 @@ blbsigma <- function(fit) {
   sqrt(sum(w * (e^2)) / (sum(w) - p))
 }
 
-#'Hello,world!
+#' Hello,world!
+#' @export
 hello <- function(){
   print("Hello, world!")
 }

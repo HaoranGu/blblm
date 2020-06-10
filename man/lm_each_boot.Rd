@@ -6,6 +6,19 @@
 \usage{
 lm_each_boot(formula, data, n)
 }
+\arguments{
+\item{formula}{a formula}
+
+\item{data}{dateframe}
+
+\item{n}{integer}
+}
+\value{
+dataframes
+}
 \description{
 compute the regression estimates for a blb dataset
+}
+\examples{
+lm_each_boot(mpg ~ wt * hp , mtcars, 3, 100, 3)
 }
